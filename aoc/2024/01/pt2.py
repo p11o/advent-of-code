@@ -9,7 +9,7 @@ def main():
             yield b
     b_counter = Counter(build())
         
-    return sum([el * b_counter.get(el, 0) for el in a_list])
+    return sum(el * b_counter.get(el, 0) for el in a_list)
 
 
 if __name__ == '__main__':
