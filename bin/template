@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+prefix="aoc/y2024/d$1"
+session=`cat .session`
+day=$(echo $1 | sed 's/^0*//')
+
+mkdir ${prefix}
+touch ${prefix}/__init__.py
+touch ${prefix}/sample.txt
+cp bin/template.py ${prefix}/solution.py
+curl -s "https://adventofcode.com/2024/day/$day/input" \
+    -H "Cookie: session=$session" \
+    -o "${prefix}/input.txt"

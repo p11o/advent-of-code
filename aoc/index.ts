@@ -33,7 +33,6 @@ export function createDefaultDict(fn) {
 }
 
 export async function Counter(iter) {
-
   async function asyncReduce(asyncGenerator, reducer, initialValue) {
     let accumulator = initialValue;
   

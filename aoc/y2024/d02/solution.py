@@ -1,9 +1,16 @@
+
 from itertools import pairwise
 from functools import reduce
 from aoc import read
 
 
-def main():
+def pt1():
+  diffs = [[y - x for x, y in pairwise(l)] for l in read(lambda x: map(int, x.split()))]
+  fns = [lambda l: all(0 < x < 4 for x in l), lambda l: all(-4 < x < 0 for x in l)]
+  return sum(len(list(filter(fn, diffs))) for fn in fns)
+
+
+def pt2():
   reports = read(lambda x: list(map(int, x.split())))
   def test(acc, levels):
     for i in range(len(levels)):
@@ -17,5 +24,9 @@ def main():
 
   return reduce(test, reports, 0)
 
-if __name__ == '__main__':
-    print(main())
+
+def test_pt1():
+  assert pt1() == 2
+
+def test_pt2():
+  assert pt2() == 4
