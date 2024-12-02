@@ -3,10 +3,11 @@
 export PYTHONPATH=.
 day=$1
 prefix="aoc/y2024/d$1"
+module="aoc.y2024.d${day}.solution"
 
 function run() {
   python3 bin/suite.py ${day} < ${prefix}/sample.txt
-  python3 <(module="aoc.y2024.d${day}.solution" envsubst < bin/main.py.tpl) < ${prefix}/input.txt
+  python3 bin/main.py ${module} < ${prefix}/input.txt
 }
 
 function main() {
