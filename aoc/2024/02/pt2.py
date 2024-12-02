@@ -6,9 +6,8 @@ from aoc import read
 def main():
   reports = read(lambda x: list(map(int, x.split())))
   def test(levels):
-    length = len(levels)
-    for i in range(length):
-      tmp = levels[0:i] + levels[i+1:length]
+    for i in range(len(levels)):
+      tmp = levels[:i] + levels[i+1:]
       diffs = [y - x for x, y in pairwise(tmp)]
       asc = [0 < d < 4 for d in diffs]
       desc = [-4 < d < 0 for d in diffs]
