@@ -5,3 +5,8 @@ prefix="aoc/y2024/d$1"
 
 python3 bin/suite.py $1 < ${prefix}/sample.txt
 python3 <(module="aoc.y2024.d$1.solution" envsubst < bin/main.py.tpl) < ${prefix}/input.txt
+
+while inotifywait -qq -e close_write ${prefix}/solution.py; do
+  python3 bin/suite.py $1 < ${prefix}/sample.txt
+  python3 <(module="aoc.y2024.d$1.solution" envsubst < bin/main.py.tpl) < ${prefix}/input.txt
+done
