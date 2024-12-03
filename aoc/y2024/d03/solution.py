@@ -1,6 +1,4 @@
 from aoc import read
-from functools import reduce
-from operator import mul
 import re
 
 
@@ -14,7 +12,7 @@ def pt1():
 
 def process(line):
   line = re.findall(pattern, line)
-  return sum([reduce(mul, [int(el) for el in pair]) for pair in line])
+  return sum([int(x) * int(y) for x, y in line])
 
 
 def pt2():
