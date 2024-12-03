@@ -20,7 +20,7 @@ def pt2():
   line = ''.join(read())
   enabled = True
   i = 0
-  while i >= 0:
+  while ~i:
     i = line.find("don't()" if enabled else "do()")
     total += process(line[:i]) if enabled else 0
     line = line[i+1:]
