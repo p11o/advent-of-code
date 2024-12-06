@@ -3,12 +3,12 @@ from aoc import read
 
 def pt1():
   for line in read():
-    return False
+    return True
 
 
 def pt2():
   for line in read():
-    return False
+    return True
 
 
 def test_pt1():
