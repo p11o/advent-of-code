@@ -1,12 +1,12 @@
 from aoc import read
-
+from copy import deepcopy
 
 lines = list(read())
 width = len(lines[0])
 board = [c for l in lines for c in list(l)]
-p = board.index('^')
+start = board.index('^')
 directions = ['up', 'right', 'down', 'left']
-direction = 0
+
 
 nxt = {
   'up': lambda p: p - width if p - width > 0 else None,
@@ -16,45 +16,58 @@ nxt = {
 }
 
 
-def pt1():
-  global p, board, nxt, direction, directions
+def navigate(board):
+  global start, nxt, direction, directions
+  board = deepcopy(board)
+  p = start
+  direction = 0
   while True:
     board[p] = 'X'
-    n = nxt[directions[direction % len(directions)]](p)
+    n = nxt[directions[direction]](p)
     if n is None:
-      return board.count('X')
+      return board
     elif board[n] == '#':
-      direction += 1
+      direction = (direction + 1) % len(directions)
     else:
       p = n
 
+def pt1():
+  global board
+  return navigate(board).count('X')
 
-trail = {
-  'up': '|',
-  'down': '|',
-  'left': '-',
-  'right': '-',
-  '|': {
-    'left': '+',
-    'right': '+'
-  },
-  '-': {
-    'up': '+',
-    'down': '+'
-  }
-}
 
+def is_loop(are, board):
+  global start, nxt, direction, directions
+  board = deepcopy(board)
+  p = start
+  direction = 0
+  board[are] = 'O'
+  seen_are = False
+  memory = set()
+  while True:
+    n = nxt[directions[direction]](p)
+    if (p, n) in memory:
+      return 1
+    if n is None:
+      return 0
+    elif board[n] == '#' or n == are:
+      direction = (direction + 1) % len(directions)
+      board[p] = '+'
+
+      if seen_are:
+        memory.add((p, n))
+    else:
+      p = n
+      board[p] = str(direction)
+    if n == are:
+      seen_are = True
 
 def pt2():
-  global p, board, nxt, direction, directions
-  while True:
-    n = nxt[directions[direction % len(directions)]](p)
-    if n is None:
-      return board.count('X')
-    elif board[n] == '#':
-      direction += 1
-    else:
-      p = n
+  global start, board
+  ares = [i for i, c in enumerate(navigate(board)) if c == 'X' and c != start]
+
+  s = sum(is_loop(are, board) for are in ares)
+  return s
 
 
 def test_pt1():
@@ -62,4 +75,4 @@ def test_pt1():
 
 
 def test_pt2():
-  assert pt2() == True
+  assert pt2() == 6
