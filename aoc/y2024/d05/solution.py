@@ -4,16 +4,16 @@ from functools import cmp_to_key
 
 def prepare():
   rules = defaultdict(list)
-  updates = []
   for line in read():
     if line == '': break
     a, b = line.split('|')
     rules[a].append(b)
-  for line in read():
-    updates.append(line.split(','))
+  updates = [line.split(',') for line in read()]
   return rules, updates
 
+
 rules, updates = prepare()
+
 
 def valid(update):
   return not any(r in update[:i] for i, u in enumerate(update) for r in rules[u])
