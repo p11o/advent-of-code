@@ -41,19 +41,19 @@ def pt1():
 def pt2():
   rules, updates = prepare()
   middles = {}
-  def reorder(update, rules, remaining):
+  def reorder(update, rules, remaining, idx):
     if not remaining and all(valid(update, rule) for rule in rules):
       mid = int(update[len(update)//2])
-      print(','.join(update))
-      middles[str(sorted(update))] = mid
-    elif all(valid(update, rule) for rule in rules) and str(sorted(update+remaining)) not in middles:
+      middles[f"{idx}-{str(sorted(update))}"] = mid
+
+    elif all(valid(update, rule) for rule in rules) and f"{idx}-{str(sorted(update+remaining))}" not in middles:
       for j, val in enumerate(remaining):
         for i in range(len(update) + 1):
           update.insert(i, val)
-          reorder(update, rules, remaining[:j] + remaining[j+1:])
+          reorder(update, rules, remaining[:j] + remaining[j+1:], idx)
           update.pop(i)
 
-  for update in updates:
+  for i, update in enumerate(updates):
     update_rules = [
       (a, b) for el in update
       for (a, b) in rules[el]
@@ -61,7 +61,7 @@ def pt2():
     ]
     statuses = [valid(update, rule) for rule in update_rules]
     if not all(statuses):
-      reorder([], update_rules, update)
+      reorder([], update_rules, update, i)
 
   return sum(middles.values())
 
