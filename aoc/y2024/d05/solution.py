@@ -1,69 +1,40 @@
 from aoc import read
 from collections import defaultdict
-
+from functools import cmp_to_key
 
 def prepare():
-  rules = defaultdict(lambda: [])
+  rules = defaultdict(list)
   updates = []
   for line in read():
     if line == '': break
-    rule = line.split('|')
-    for el in rule:
-      rules[el].append(rule)
+    a, b = line.split('|')
+    rules[a].append(b)
   for line in read():
     updates.append(line.split(','))
   return rules, updates
 
+rules, updates = prepare()
 
-def valid(update, rule):
-  x, y = rule
-  if x in update and y in update:
-    a, b = [update.index(el) for el in rule]
-    return a < b
-  return True
+def valid(update):
+  return not any(r in update[:i] for i, u in enumerate(update) for r in rules[u])
 
 
 def pt1():
-  rules, updates = prepare()
-  middles = []
-  for update in updates:
-    update_rules = [
-      (a,b) for el in update
-      for (a, b) in rules[el]
-      if a in update and b in update
-    ]
-    if all(valid(update, rule) for rule in update_rules):
-      middles.append(int(update[len(update) // 2]))
-  return sum(middles)
-
+  return sum(
+    int(update[len(update) // 2])
+    for update in updates
+    if valid(update)
+  )
 
 
 def pt2():
-  rules, updates = prepare()
-  middles = {}
-  def reorder(update, rules, remaining, idx):
-    if not remaining and all(valid(update, rule) for rule in rules):
-      mid = int(update[len(update)//2])
-      middles[f"{idx}-{str(sorted(update))}"] = mid
+  cmp = cmp_to_key(lambda a, b: -1 if b in rules[a] else 1)
 
-    elif all(valid(update, rule) for rule in rules) and f"{idx}-{str(sorted(update+remaining))}" not in middles:
-      for j, val in enumerate(remaining):
-        for i in range(len(update) + 1):
-          update.insert(i, val)
-          reorder(update, rules, remaining[:j] + remaining[j+1:], idx)
-          update.pop(i)
-
-  for i, update in enumerate(updates):
-    update_rules = [
-      (a, b) for el in update
-      for (a, b) in rules[el]
-      if a in update and b in update
-    ]
-    statuses = [valid(update, rule) for rule in update_rules]
-    if not all(statuses):
-      reorder([], update_rules, update, i)
-
-  return sum(middles.values())
+  return sum(
+    int(sorted(update, key=cmp)[len(update) // 2])
+    for update in updates
+    if not valid(update)
+  )
 
 
 def test_pt1():
