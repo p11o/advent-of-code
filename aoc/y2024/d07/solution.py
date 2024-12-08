@@ -4,21 +4,19 @@ from itertools import product
 from functools import reduce
 
 
-def prepare():
-  return [
-    (int(res), list(map(int, nums.split(' '))))
-    for res, nums in read(lambda x: x.split(': '))
-  ]
+def data():
+  for res, nums in read(lambda x: x.split(': ')):
+    yield (int(res), list(map(int, nums.split(' '))))
+
 
 def compute(ops=[mul, add]):
-  eqs = prepare()
   def reducer(acc, op_val):
     op, val = op_val
     return op(acc, val)
   
   return sum(
     res
-    for res, values in eqs
+    for res, values in data()
     if any(
       reduce(reducer, zip(p, values[1:]), values[0]) == res 
       for p in product(ops, repeat=len(values) - 1)
@@ -31,7 +29,7 @@ def pt1():
 
 
 def pt2():
-  concat = lambda x, y: int(f"{x}{y}")
+  def concat(x, y): return int(f"{x}{y}")
   return compute([mul, add, concat])
 
 
