@@ -1,59 +1,56 @@
 from aoc import read
-from itertools import combinations, groupby
+from itertools import combinations, groupby, starmap
 from operator import add, sub
-from functools import reduce, partial
 from math import gcd
 
+
 def prepare():
-  m = list(read(list))
+  global MAP, HEIGHT, WIDTH
+  MAP = list(read(list))
+  HEIGHT = len(MAP)
+  WIDTH = len(MAP[0])
   groups = groupby(
-    sorted([(e, x, y) for x, r in enumerate(m) for y, e in enumerate(r) if e != '.']),
+    sorted([(e, x, y) for x, r in enumerate(MAP) for y, e in enumerate(r) if e != '.']),
     lambda e: e[0]
   )
-  return m, groups
+  return groups
 
 
 def compute(op, a, b):
-  return tuple(map(partial(reduce, op), zip(a, b)))
+  return tuple(starmap(op, zip(a, b)))
 
-def antinodes(a, b, m, inline=False):
+
+def antinodes(a, b, inline=False):
   diff = compute(sub, a, b)
   if inline:
-    dx, dy = diff
-    d = gcd(dx, dy)
-    diff = dx // d, dy // d
-  directions = [(add, a), (sub, b)]
-  for op, p in directions:
-    c = 0
+    diff = tuple(d // gcd(*diff) for d in diff)
+  for op, p in [(add, a), (sub, b)]:
+    once = not inline
     nxt = compute(op, p, diff)
-    while inboard(*nxt, m) and (c < 1 or inline):
-      c += 1
+    while inboard(*nxt) and (inline or once):
+      once = False
       yield nxt
       nxt = compute(op, nxt, diff)
 
-def inboard(x, y, m):
-  return 0 <= x and 0 <= y and x < len(m) and y < len(m[0])
+def inboard(x, y):
+  return 0 <= x and 0 <= y and x < HEIGHT and y < WIDTH
+
+
+def solve(inline=False):
+  groups = prepare()
+  for _, positions in groups:
+    for i, j in combinations(positions, 2):
+      for x, y in antinodes(i[1:], j[1:], inline):
+        MAP[x][y] = '#'
 
 def pt1():
-  m, groups = prepare()
-
-  for g, positions in groups:
-    for i, j in combinations(positions, 2):
-      for x, y in antinodes(i[1:], j[1:], m):
-        m[x][y] = '#'
-
-  return sum(l.count('#') for l in m)
+  solve()
+  return sum(r.count('#') for r in MAP)
 
 
 def pt2():
-  m, groups = prepare()
-
-  for g, positions in groups:
-    for i, j in combinations(positions, 2):
-      for x, y in antinodes(i[1:], j[1:], m, inline=True):
-        m[x][y] = '#'
-
-  return sum(len(l) - l.count('.') for l in m)
+  solve(inline=True)
+  return sum(len(r) - r.count('.') for r in MAP)
 
 
 def test_pt1():
